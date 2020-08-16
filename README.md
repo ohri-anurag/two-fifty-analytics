@@ -6,6 +6,10 @@ This project will be used to record each game's outcome for the game 250. Each g
 
 Run `lein run` from the root of the repo. It will start a simple HTTP server.
 
+## TODO
+1. POST request should add a new row in table `two-fifty`
+2. Create table query should only work when table does not exist. In case table already exists, it shouldn't now throw exceptions. Should fail quietly.
+
 ## License
 
 Copyright © 2020 Anurag Ohri
