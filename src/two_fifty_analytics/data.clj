@@ -39,13 +39,12 @@
 (defn parseTrumpData
   [str]
   (let [[trump helperData] (str/split str #"\|")]
-    {:trump trump :helpers (parseHelperData helperData)}))
+    {:trump trump
+     :helpers (if (nil? helperData)
+                '()
+                (parseHelperData helperData))}))
 
 (defn parseGameData
   [str]
   (let [[group scoreData trumpData teamData] (str/split str #";")]
     (into {:group group} [(parseScoreData scoreData), (parseTrumpData trumpData), (parseTeamsData teamData)])))
-
-;; (parseGameData "a;180,190;diamond|ace:diamond,ace:club;ohri:Anurag,gupta:avikant,jain1:navneet|jain2:apoorv,jain3:devendra,s:yogesh")
-; (parseTeamsData "ohri:Anurag,gupta:avikant,jain1:navneet|jain2:apoorv,jain3:devendra,s:yogesh")
-;; (clojure.repl/doc parsePlayerData)
