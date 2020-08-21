@@ -3,9 +3,8 @@
   (:require [clojure.string :as s]))
 
 (def db {:connection-uri
-         (str "jdbc:"
-              (or (System/getenv "JDBC_DATABASE_URL")
-                  "postgresql://localhost:5432/two-fifty?user=postgres&password=admin"))})
+         (or (System/getenv "JDBC_DATABASE_URL")
+             "jdbc:postgresql://localhost:5432/two-fifty?user=postgres&password=admin")})
 
 (defn initialize-db
   []
