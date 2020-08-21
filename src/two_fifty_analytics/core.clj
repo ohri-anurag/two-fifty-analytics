@@ -2,7 +2,8 @@
   (:require [org.httpkit.server :refer [run-server]]
             [compojure.core :refer [defroutes GET POST]]
             [two-fifty-analytics.data :refer [parseGameData]]
-            [two-fifty-analytics.sql :refer [initialize-db add-row]]))
+            [two-fifty-analytics.sql :refer [initialize-db add-row]])
+  (:gen-class))
 
 (defroutes app
   (POST "/" request

@@ -10,4 +10,5 @@
                  [org.clojure/java.jdbc "0.7.11"]
                  [org.postgresql/postgresql "42.2.14"]]
   :repl-options {:init-ns two-fifty-analytics.core}
+  :uberjar-name "two-fifty-analytics-standalone.jar"
   :main two-fifty-analytics.core)
