@@ -4,7 +4,7 @@
 
 (def db {:connection-uri
          (str "jdbc:"
-              (or (System/getenv "DATABASE_URL")
+              (or (System/getenv "JDBC_DATABASE_URL")
                   "postgresql://localhost:5432/two-fifty?user=postgres&password=admin"))})
 
 (defn initialize-db
