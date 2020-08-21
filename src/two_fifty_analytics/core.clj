@@ -14,4 +14,4 @@
 
 (defn -main [& args]
   (initialize-db)
-  (run-server app {:port 443}))
+  (run-server app {:port (Integer/parseInt (or (System/getenv "PORT") "8081"))}))
