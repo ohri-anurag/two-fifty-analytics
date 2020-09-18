@@ -89,10 +89,6 @@
 (defn total-numbers
   []
   (let [bidderWonRounds (sql/query db ["select bidder, bid, bidding_team from records where bid <= score"])]
-    (json/write-str (reduce accumulate-score-and-bids {} bidderWonRounds))))
-
-(total-numbers)
-
-(accumulate-score-and-bids {} {:bidder "22,2" :bid 150 :bidding_team "22,2;33,3"})
-
-(add-player-score 180 {"22" [180 0]} {:id "33", :name "3"})
+    (json/write-str
+     (vals
+      (reduce accumulate-score-and-bids {} bidderWonRounds)))))
