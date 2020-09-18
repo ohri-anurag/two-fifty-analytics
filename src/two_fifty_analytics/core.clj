@@ -13,7 +13,9 @@
        :body    (add-row (parseGameData (apply str (map #(char (bit-and % 255)) byte-stream))))}))
   (GET "/total" []
     {:status 200
-     :headers {"Content-Type" "application/json"}
+     :headers {"Content-Type" "application/json"
+               "Access-Control-Allow-Origin" "*"
+               }
      :body (total-numbers)}))
 
 (defn -main [& args]
