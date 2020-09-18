@@ -67,28 +67,47 @@
   [score acc player]
   (update-in
    acc
-   [(:id player)]
-   (fn [old-data]
-     (if (nil? old-data)
-       {:score score :name (:name player) :bids 0}
-       (update-in old-data [:score] + score)))))
+   [(:id player) :score]
+   +
+   score))
+
+(defn createPlayerData
+  [existing-players players]
+  (reduce
+   (fn [acc player]
+     (if (contains? acc (:id player))
+       acc
+       (conj acc
+             [(:id player)
+              {:name (:name player)
+               :score 0
+               :bids 0}])))
+   existing-players
+   players))
 
 (defn accumulate-score-and-bids
   [acc row]
-  (let [{:keys [bidding_team bid bidder]} row
-        bidder-id (:id (parse-player-data bidder))]
+  (let [{:keys [anti_team bidding_team bid score bidder]} row
+        winners (parse-team-data (if (<= bid score) bidding_team anti_team))
+        playerData (createPlayerData acc (concat (parse-team-data bidding_team) (parse-team-data anti_team)))
+        actual-score
+        (if (<= bid score)
+          bid
+          (if (>= (- 250 score) 100)
+            bid
+            (- 250 score)))]
     (update-in
      (reduce
-      (partial add-player-score bid)
-      acc
-      (parse-team-data bidding_team))
-     [bidder-id :bids]
+      (partial add-player-score actual-score)
+      playerData
+      winners)
+     [bidder :bids]
      +
      1)))
 
 (defn total-numbers
   []
-  (let [bidderWonRounds (sql/query db ["select bidder, bid, bidding_team from records where bid <= score"])]
+  (let [bidderWonRounds (sql/query db ["select bidder, bid, score, bidding_team, anti_team from records"])]
     (json/write-str
      (vals
       (reduce accumulate-score-and-bids {} bidderWonRounds)))))
