@@ -1,4 +1,5 @@
 (ns two-fifty-analytics.sql
+  (:require [clojure.data.json :as json])
   (:require [clojure.java.jdbc :as sql])
   (:require [clojure.string :as s]))
 
@@ -51,3 +52,47 @@
                 :bidding_team (s/join ";" (map userString bid-team))
                 :anti_team (s/join ";" (map userString anti-team))
                 }))
+
+; TOTAL NUMBERS
+(defn parse-player-data
+  [str]
+  (let [[id name] (s/split str #",")]
+    {:id id :name name}))
+
+(defn parse-team-data
+  [str]
+  (map parse-player-data (s/split str #";")))
+
+(defn add-player-score
+  [score acc player]
+  (update-in
+   acc
+   [(:id player)]
+   (fn [old-data]
+     (if (nil? old-data)
+       {:score score :name (:name player) :bids 0}
+       (update-in old-data [:score] + score)))))
+
+(defn accumulate-score-and-bids
+  [acc row]
+  (let [{:keys [bidding_team bid bidder]} row
+        bidder-id (:id (parse-player-data bidder))]
+    (update-in
+     (reduce
+      (partial add-player-score bid)
+      acc
+      (parse-team-data bidding_team))
+     [bidder-id :bids]
+     +
+     1)))
+
+(defn total-numbers
+  []
+  (let [bidderWonRounds (sql/query db ["select bidder, bid, bidding_team from records where bid <= score"])]
+    (json/write-str (reduce accumulate-score-and-bids {} bidderWonRounds))))
+
+(total-numbers)
+
+(accumulate-score-and-bids {} {:bidder "22,2" :bid 150 :bidding_team "22,2;33,3"})
+
+(add-player-score 180 {"22" [180 0]} {:id "33", :name "3"})
