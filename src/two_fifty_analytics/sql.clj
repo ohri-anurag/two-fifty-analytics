@@ -54,60 +54,7 @@
                 }))
 
 ; TOTAL NUMBERS
-(defn parse-player-data
-  [str]
-  (let [[id name] (s/split str #",")]
-    {:id id :name name}))
-
-(defn parse-team-data
-  [str]
-  (map parse-player-data (s/split str #";")))
-
-(defn add-player-score
-  [score acc player]
-  (update-in
-   acc
-   [(:id player) :score]
-   +
-   score))
-
-(defn createPlayerData
-  [existing-players players]
-  (reduce
-   (fn [acc player]
-     (if (contains? acc (:id player))
-       acc
-       (conj acc
-             [(:id player)
-              {:name (:name player)
-               :score 0
-               :bids 0}])))
-   existing-players
-   players))
-
-(defn accumulate-score-and-bids
-  [acc row]
-  (let [{:keys [anti_team bidding_team bid score bidder]} row
-        winners (parse-team-data (if (<= bid score) bidding_team anti_team))
-        playerData (createPlayerData acc (concat (parse-team-data bidding_team) (parse-team-data anti_team)))
-        actual-score
-        (if (<= bid score)
-          bid
-          (if (>= (- 250 score) 100)
-            bid
-            (- 250 score)))]
-    (update-in
-     (reduce
-      (partial add-player-score actual-score)
-      playerData
-      winners)
-     [bidder :bids]
-     +
-     1)))
-
 (defn total-numbers
   []
-  (let [bidderWonRounds (sql/query db ["select bidder, bid, score, bidding_team, anti_team from records"])]
-    (json/write-str
-     (vals
-      (reduce accumulate-score-and-bids {} bidderWonRounds)))))
+  (let [results (sql/query db [(slurp "src/two_fifty_analytics/sql/total.pgsql")])]
+    (json/write-str results)))
