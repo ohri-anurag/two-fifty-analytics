@@ -47,7 +47,7 @@
     ;; Insert both teams into teams table
     (sql/db-do-commands db
                         (str "insert into teams(p1,p2,p3,p4,p5) values "
-                             (s/join "," (map (fn [t] (str "(" (s/join "," (concat t (repeat (- 5 (count bid-team)) 0))) ")")) [bid_team anti_team]))
+                             (s/join "," (map (fn [t] (str "(" (s/join "," (concat t (repeat (- 5 (count t)) 0))) ")")) [bid_team anti_team]))
                              " on conflict do nothing"))
     (let [teams (into {}
                       (map (fn [t] [(filter #(> %1 0) [(:p1 t) (:p2 t) (:p3 t) (:p4 t) (:p5 t)])
