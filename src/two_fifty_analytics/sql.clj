@@ -4,29 +4,45 @@
   (:require [clojure.string :as s]))
 
 (def db {:connection-uri
-        ;;  "jdbc:postgresql://ec2-34-251-118-151.eu-west-1.compute.amazonaws.com:5432/d1mavs46gvif3m?user=qndtnnugfgwkyi&password=c5e3d4971b990d7916d0c697edb3da995daf9912c05ef291646d17c36f23f61c"})
-         (or (System/getenv "JDBC_DATABASE_URL")
-             "jdbc:postgresql://localhost:5432/two-fifty?user=postgres&password=admin")})
+        ;;  "jdbc:postgresql://localhost:5432/two-fifty?user=postgres&password=admin"})
+         "jdbc:postgresql://35.240.166.214:5432/postgres?user=postgres&password=250aadmi"})
 
 (defn initialize-db
   []
   (sql/db-do-commands
    db
-   (sql/create-table-ddl
-    :games
-    [[:id "serial" "primary key"]
-     [:group_name "varchar(11)"]
-     [:bid :smallint]
-     [:trump "varchar(11)"]
-     [:helper1 "varchar(15)"]
-     [:helper2 "varchar(15)"]
-     [:score :smallint]
-     [:bidder :integer]
-     [:bidding_team :integer]
-     [:anti_team :integer]
-     [:date_played :timestamp "default" "current_timestamp"]]
-    {:conditional? true}
-    )))
+   [(sql/create-table-ddl
+     :games
+     [[:id "serial" "primary key"]
+      [:group_name "varchar(11)" "not null"]
+      [:bid :smallint "not null"]
+      [:trump "varchar(11)" "not null"]
+      [:helper1 "varchar(15)"]
+      [:helper2 "varchar(15)"]
+      [:score :smallint "not null"]
+      [:bidder :integer "not null"]
+      [:bidding_team :integer "not null"]
+      [:anti_team :integer "not null"]
+      [:date_played :timestamp "default" "current_timestamp"]]
+     {:conditional? true}
+     )
+    (sql/create-table-ddl
+     :teams
+     [[:id "serial" "primary key"]
+      [:p1 :integer "not null"]
+      [:p2 :integer "not null"]
+      [:p3 :integer "not null"]
+      [:p4 :integer "not null"]
+      [:p5 :integer "not null"]
+      ["CONSTRAINT each_row_unique UNIQUE (p1, p2, p3, p4, p5)"]]
+     {:conditional? true})
+    (sql/create-table-ddl
+     :players
+     [[:id "serial" "primary key"]
+      [:player_id "varchar(32)" "not null"]
+      [:player_name "varchar(32)" "not null"]
+      ["CONSTRAINT player_id_unique UNIQUE (player_id)"]]
+     {:conditional? true})]))
 
 (defn helperString
   [{:keys [card suit]}]
