@@ -57,8 +57,8 @@
   (let [players (into {}
                       (map (fn [p] [(:player_id p) (:id p)])
                            (sql/query db "select id, player_id from players")))
-        bid_team (map (comp #(get players %1) :id) bid-team)
-        anti_team (map (comp #(get players %1) :id) anti-team)
+        bid_team (sort (map (comp #(get players %1) :id) bid-team))
+        anti_team (sort (map (comp #(get players %1) :id) anti-team))
         ]
     ;; Insert both teams into teams table
     (sql/db-do-commands db
