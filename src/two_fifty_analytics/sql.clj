@@ -58,8 +58,7 @@
                       (map (fn [p] [(:player_id p) (:id p)])
                            (sql/query db "select id, player_id from players")))
         bid_team (sort (map (comp #(get players %1) :id) bid-team))
-        anti_team (sort (map (comp #(get players %1) :id) anti-team))
-        ]
+        anti_team (sort (map (comp #(get players %1) :id) anti-team))]
     ;; Insert both teams into teams table
     (sql/db-do-commands db
                         (str "insert into teams(p1,p2,p3,p4,p5) values "
@@ -71,7 +70,7 @@
                            (sql/query db "select * from teams")))
           bid_team_id (get teams bid_team)
           anti_team_id (get teams anti_team)
-          bidder (first bid_team)]
+          bidder (get players (:id (first bid-team)))]
       ;; Insert the game details into games table
       (sql/insert! db :games
                    {:group_name group
