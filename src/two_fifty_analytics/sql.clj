@@ -5,7 +5,7 @@
 
 (def db {:connection-uri
         ;;  "jdbc:postgresql://localhost:5432/two-fifty?user=postgres&password=admin"})
-         "jdbc:postgresql://35.240.166.214:5432/postgres?user=postgres&password=250aadmi"})
+        (str "jdbc:postgresql://" (slurp "public/postgres-ip.txt") "/postgres?user=postgres&password=250aadmi")})
 
 (defn initialize-db
   []
@@ -109,5 +109,5 @@
 ; TOTAL NUMBERS
 (defn total-numbers
   []
-  (let [results (sql/query db [(slurp "src/two_fifty_analytics/sql/total.pgsql")])]
+  (let [results (sql/query db [(slurp "sql/total.pgsql")])]
     (json/write-str results)))
